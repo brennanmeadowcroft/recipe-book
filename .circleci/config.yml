@@ -28,10 +28,14 @@ workflows:
           filters:
             tags:
               only: /^([0-9.]*){3}/
+          branches:
+            ignore: /.*/
       - docker/publish:
           filters:
             tags:
               only: /^([0-9.]*){3}/
+            branches:
+              ignore: /.*/
           requires:
             - build-and-test
           context: docker-hub
