@@ -1,5 +1,9 @@
 # Recipe Book
 
+# Template:
+
+[![oppity](https://circleci.com/gh/oppity/recipe-book.svg?style=svg)](https://app.circleci.com/github/oppity/recipe-book/pipelines)
+
 Recipe Book is a lightweight mock server that takes a provided request/response cycle and returns it when called.  This allows for easy mocking of services to improve the speed, reliability and thoroughness of functional testing.  Mocks can be created on the fly as part of an automated test so that it is clear what scenario is being tested right inside the test.
 
 **Why "Recipe Book"?**

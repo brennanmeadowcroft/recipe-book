@@ -1,4 +1,6 @@
 version: 2.1
+orbs:
+  docker: circleci/docker@x.y.z
 jobs:
   build-and-test:
     docker:
@@ -11,17 +13,17 @@ jobs:
       - run:
           name: Unit test
           command: npm run test:unit
-  deploy-to-docker:
-    docker:
-      - image: circleci/node:12.16.0
-    environment:
-      GIT_HASH: echo ${CIRCLE_SHA1:0:7}
-    steps:
-      - run: echo ${GIT_HASH}
-      - run: echo ${CIRCLE_SHA1:0:7}
-      - run: echo ${CIRCLE_SHA1}
+
 workflows:
   build-and-test:
     jobs:
       - build-and-test
-      - deploy-to-docker
+  build-and-publish-docker-image:
+    jobs:
+      - build-and-test
+      - docker/publish:
+          requires:
+            - build-and-test
+          image: $CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME
+          tag: "latest, ${CIRCLE_SHA1:0:7}"
+          use-docker-credentials-store: true
