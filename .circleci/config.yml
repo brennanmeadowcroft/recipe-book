@@ -13,6 +13,15 @@ jobs:
       - run:
           name: Unit test
           command: npm run test:unit
+  verify-vars:
+    steps:
+      - run:
+          name: check var
+          command: echo "${CIRCLE_SHA1:0:7}"
+      - run:
+          name: check sha
+          command: echo "${CIRCLE_SHA}"
+
 workflows:
   build-and-test:
     jobs:
@@ -28,6 +37,7 @@ workflows:
       #   branches:
       #     only:
       #       - master
+      - verify-vars
       - docker/publish:
           # filters:
           #   branches:
@@ -37,6 +47,6 @@ workflows:
           #   - build-and-test
           context: docker-hub
           image: $CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME
-          tag: "latest, ${CIRCLE_SHA1:0:7}"
+          tag: "latest, $(${CIRCLE_SHA1:0:7})"
           # tag: latest
           use-docker-credentials-store: true
