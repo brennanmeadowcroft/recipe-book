@@ -1,17 +1,44 @@
 version: 2.1
 orbs:
-  node: circleci/node@1.1.6
+  docker: circleci/docker@0.6.1
 jobs:
   build-and-test:
-    executor:
-      name: node/default
+    docker:
+      - image: circleci/node:12.16.0
     steps:
       - checkout
-      - node/with-cache:
-          steps:
-            - run: npm install
-            - run: npm test
+      - run:
+          name: Install dependencies
+          command: npm install
+      - run:
+          name: Unit test
+          command: npm run test:unit
+
 workflows:
   build-and-test:
     jobs:
-      - build-and-test
+      - build-and-test:
+          filters:
+            branches:
+              only: /.*/
+
+  build-and-publish-docker-image:
+    jobs:
+      - build-and-test:
+          filters:
+            tags:
+              only: /^([0-9.]*){3}/
+            branches:
+              ignore: /.*/
+      - docker/publish:
+          filters:
+            tags:
+              only: /^([0-9.]*){3}/
+            branches:
+              ignore: /.*/
+          requires:
+            - build-and-test
+          context: docker-hub
+          image: $CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME
+          tag: $CIRCLE_TAG
+          use-docker-credentials-store: true
