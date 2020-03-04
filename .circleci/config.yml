@@ -18,13 +18,26 @@ workflows:
   build-and-test:
     jobs:
       - build-and-test
+          filters:
+            branches:
+              ignore:
+                - master
   build-and-publish-docker-image:
     jobs:
-      - build-and-test
+      # - build-and-test
+      # filters:
+      #   branches:
+      #     only:
+      #       - master
       - docker/publish:
-          requires:
-            - build-and-test
+          # filters:
+          #   branches:
+          #     only:
+          #       - master
+          # requires:
+          #   - build-and-test
           context: docker-hub
           image: $CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME
-          tag: latest, ${CIRCLE_SHA1:0:7}
+          # tag: latest, ${CIRCLE_SHA1:0:7}
+          tag: latest
           use-docker-credentials-store: true
