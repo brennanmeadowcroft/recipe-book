@@ -17,19 +17,13 @@ jobs:
 workflows:
   build-and-test:
     jobs:
-      - build-and-test:
+      - build-and-test
   build-and-publish-docker-image:
     jobs:
-      - build-and-test:
-          filters:
-            tags:
-              only: /^([0-9.]*){3}/
       - docker/publish:
           filters:
             tags:
               only: /^([0-9.]*){3}/
-          requires:
-            - build-and-test
           context: docker-hub
           image: $CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME
           tag: $CIRCLE_TAG
