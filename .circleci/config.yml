@@ -13,7 +13,6 @@ jobs:
       - run:
           name: Unit test
           command: npm run test:unit
-
 workflows:
   build-and-test:
     jobs:
@@ -38,6 +37,6 @@ workflows:
           #   - build-and-test
           context: docker-hub
           image: $CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME
-          # tag: latest, ${CIRCLE_SHA1:0:7}
-          tag: latest
+          tag: "latest, ${CIRCLE_SHA1:0:7}"
+          # tag: latest
           use-docker-credentials-store: true
