@@ -17,14 +17,14 @@ jobs:
 workflows:
   build-and-test:
     jobs:
-      - build-and-test
+      - build-and-test:
           filters:
             branches:
               ignore:
                 - master
   build-and-publish-docker-image:
     jobs:
-      # - build-and-test
+      # - build-and-test:
       # filters:
       #   branches:
       #     only:
