@@ -24,6 +24,7 @@ workflows:
       - docker/publish:
           requires:
             - build-and-test
+          context: docker-hub
           image: $CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME
           tag: "latest, ${CIRCLE_SHA1:0:7}"
           use-docker-credentials-store: true
