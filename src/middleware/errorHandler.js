@@ -14,7 +14,6 @@ const errorHandler = (err, req, res, next) => {
     }
   };
 
-  console.log("Handling error", err.name);
   const { statusCode } = errors[err.name] || errors.Default;
   const errorResponse = {
     error: err.name,

@@ -1,6 +1,6 @@
 const logger = require("../lib/logger");
 
-const loggerMiddleware = (err, req, res, next) => {
+const loggerMiddleware = (req, res, next) => {
   req.logger = logger;
   next();
 };
