@@ -1,0 +1,50 @@
+<html>
+
+<head>
+  <script src="https://code.jquery.com/jquery-3.4.1.min.js"
+    integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+</head>
+
+<body>
+  <h1>Test page</h1>
+  <div>
+    <button id="getRequest">Issue GET /hello</button>
+    <button id="postRequest">Issue POST /hello</button>
+  </div>
+  <p id="heading"></p>
+  <div id="error">
+    <p id="errorMessage"></p>
+    <p id="statusCode"></p>
+  </div>
+</body>
+<script>
+  function submitRequest(method) {
+    const url = 'http://{{mockUrl}}/hello'
+
+    $('#heading').html('')
+    $('#errorMessage').html('')
+    $('#statusCode').html('')
+
+    $.ajax({
+      url: url,
+      type: method,
+      crossDomain: true,
+      success: function (data) {
+        $('#heading').html(data.hello)
+      },
+      error: function (xhr, status, error) {
+        $('#errorMessage').html(`${xhr.responseJSON.message}`)
+        $('#statusCode').html(`${xhr.status}`)
+      }
+    })
+  }
+  $('#getRequest').click(function () {
+    submitRequest('GET')
+  })
+
+  $('#postRequest').click(function () {
+    submitRequest('POST')
+  })
+</script>
+
+</html>

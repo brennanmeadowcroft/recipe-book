@@ -1,0 +1,19 @@
+version: "3"
+services:
+  recipe-book:
+    build: ../
+    container_name: recipe-book
+    environment:
+      - PORT=3000
+    ports:
+      - 3000:3000
+    command: node 'index.js'
+  example-ui:
+    build: .
+    container_name: example-ui
+    environment:
+      - PORT=8000
+      - MOCK_SERVICE_DOMAIN=localhost:3000
+    ports:
+      - 8000:8000
+    command: node 'server/server.js'
