@@ -49,6 +49,5 @@ workflows:
           #   - build-and-test
           context: docker-hub
           image: $CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME
-          tag: "latest, $(echo ${CIRCLE_SHA1:0:7})"
-          # tag: latest
+          tag: $CIRCLE_TAG
           use-docker-credentials-store: true
