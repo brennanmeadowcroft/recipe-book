@@ -5,10 +5,12 @@ jobs:
       - image: circleci/node:12.16.0
     steps:
       - checkout
-      - node/with-cache:
-          steps:
-            - run: npm install
-            - run: npm test:unit
+      - run:
+          name: Install dependencies
+          command: npm install
+      - run:
+          name: Unit test
+          command: npm test:unit
 workflows:
   build-and-test:
     jobs:
