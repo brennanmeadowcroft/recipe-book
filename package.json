@@ -1,0 +1,37 @@
+{
+  "name": "recipe-book",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "docker build -t oppity/recipe-book .",
+    "prestart:docker": "npm run build",
+    "deploy:docker": "docker ",
+    "predeploy:docker": "docker tag ",
+    "start:docker": "docker run -p 3000:3000 -itd --rm --name recipe-book oppity/recipe-book",
+    "start": "nodemon ./src/index.js",
+    "test:integration": "LOG_LEVEL=error mocha ./src/**/*.integration.js",
+    "test:unit": "LOG_LEVEL=error mocha ./src/**/*.spec.js",
+    "test": "LOG_LEVEL=error mocha ./src/**/*.*.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@hapi/joi": "^17.1.0",
+    "axios": "^0.19.2",
+    "body-parser": "^1.19.0",
+    "bunyan": "^1.8.12",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "lodash.get": "^4.4.2",
+    "lodash.isequal": "^4.5.0"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "lodash.clonedeep": "^4.5.0",
+    "mocha": "^7.0.1",
+    "nodemon": "^2.0.2",
+    "sinon": "^9.0.0",
+    "supertest": "^4.0.2"
+  }
+}
