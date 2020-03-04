@@ -22,9 +22,8 @@ workflows:
     jobs:
       - build-and-test:
           filters:
-            filters:
-              tags:
-                only: /^([0-9.]*){3}/
+            tags:
+              only: /^([0-9.]*){3}/
       - docker/publish:
           filters:
             tags:
