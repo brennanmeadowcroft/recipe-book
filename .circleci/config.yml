@@ -11,7 +11,17 @@ jobs:
       - run:
           name: Unit test
           command: npm run test:unit
+  deploy-to-docker:
+    docker:
+      - image: circleci/node:12.16.0
+    environment:
+      GIT_HASH: echo ${CIRCLE_SHA1:0:7}
+    steps:
+      - run: echo ${GIT_HASH}
+      - run: echo ${CIRCLE_SHA1:0:7}
+      - run: echo ${CIRCLE_SHA1}
 workflows:
   build-and-test:
     jobs:
       - build-and-test
+      - deploy-to-docker
