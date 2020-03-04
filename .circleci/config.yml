@@ -13,40 +13,24 @@ jobs:
       - run:
           name: Unit test
           command: npm run test:unit
-  verify-vars:
-    docker:
-      - image: circleci/node:12.16.0
-    steps:
-      - run:
-          name: check var
-          command: echo "${CIRCLE_SHA1:0:7}"
-      - run:
-          name: check sha
-          command: echo "${CIRCLE_SHA}"
 
 workflows:
   build-and-test:
     jobs:
       - build-and-test:
-          filters:
-            branches:
-              ignore:
-                - master
   build-and-publish-docker-image:
     jobs:
-      # - build-and-test:
-      # filters:
-      #   branches:
-      #     only:
-      #       - master
-      - verify-vars
+      - build-and-test:
+          filters:
+            filters:
+              tags:
+                only: /^[0-9]*\.[0-9]*\.[0-9]*/
       - docker/publish:
-          # filters:
-          #   branches:
-          #     only:
-          #       - master
-          # requires:
-          #   - build-and-test
+          filters:
+            tags:
+              only: /^[0-9]*\.[0-9]*\.[0-9]*/
+          requires:
+            - build-and-test
           context: docker-hub
           image: $CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME
           tag: $CIRCLE_TAG
