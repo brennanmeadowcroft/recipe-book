@@ -9,7 +9,7 @@
     "deploy:docker": "docker ",
     "predeploy:docker": "docker tag ",
     "start:docker": "docker run -p 3000:3000 -itd --rm --name recipe-book oppity/recipe-book",
-    "start": "nodemon ./src/index.js",
+    "start": "nodemon ./src/index.js | bunyan",
     "test:integration": "LOG_LEVEL=error mocha ./src/**/*.integration.js",
     "test:unit": "LOG_LEVEL=error mocha ./src/**/*.spec.js",
     "test": "LOG_LEVEL=error mocha ./src/**/*.*.js"

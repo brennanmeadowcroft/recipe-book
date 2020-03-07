@@ -15,7 +15,9 @@ function Mock(options = {}) {
         .allow("GET", "PUT", "PATCH", "POST", "DELETE")
     },
     response: {
-      body: Joi.object().default({}),
+      body: Joi.alternatives()
+        .try(Joi.object(), Joi.array())
+        .default({}),
       headers: Joi.object(),
       statusCode: Joi.number()
         .greater(199)

@@ -14,6 +14,18 @@ const errorHandler = (err, req, res, next) => {
     }
   };
 
+  req.logger.error(
+    {
+      error: {
+        message: err.message
+      },
+      request: {
+        path: req.originalUrl,
+        method: req.method
+      }
+    },
+    "Error received from a route"
+  );
   const { statusCode } = errors[err.name] || errors.Default;
   const errorResponse = {
     error: err.name,
