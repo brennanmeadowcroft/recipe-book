@@ -11,6 +11,10 @@ describe("Requesting a mock", function() {
       .send({ data: mock });
   };
 
+  afterEach(async function() {
+    await request(app).delete("/mocks");
+  });
+
   describe("with a GET request", function() {
     it("should return the correct mock", async function() {
       const getMock = cloneDeep(validMock);
@@ -85,6 +89,27 @@ describe("Requesting a mock", function() {
           expect(response.body).to.have.keys(["error", "message"]);
           expect(response.body.error).to.eq("NotFoundError");
         });
+    });
+  });
+
+  describe("When a mock contains a timeout", function() {
+    it("should wait the provided interval before returning", async function() {
+      const WAIT_INTERVAL_MS = 1000;
+
+      const timeoutMock = cloneDeep(validMock);
+      timeoutMock.response.timeout = WAIT_INTERVAL_MS;
+      await submitMock(timeoutMock);
+
+      const startTime = Date.now();
+      await request(app).get(timeoutMock.request.path);
+
+      const endTime = Date.now();
+      const waitTime = endTime - startTime;
+      const ALLOWED_VARIANCE_MS = 10; // This is to allow for time to run the code beyond the timeout
+      expect(waitTime).to.be.within(
+        WAIT_INTERVAL_MS,
+        WAIT_INTERVAL_MS + ALLOWED_VARIANCE_MS
+      );
     });
   });
 });

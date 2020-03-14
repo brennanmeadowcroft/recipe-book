@@ -61,6 +61,7 @@ A new mock should follow a particular format:
 | `request.method`      | The http method used in the request                             | String  | GET, PUT, POST, PATCH, DELETE |
 | `response.body`       | The body that will be returned when this mock is called.        | Object  |                               |
 | `response.statusCode` | The status code that will be returned when this mock is called. | Integer | Any valid status code         |
+| `response.timeout`    | A time for the Recipe Book to wait before responding.           | Integer | Measured in milliseconds      |
 
 ### Matching A Mock
 
@@ -75,5 +76,5 @@ Refer to the `/example` directory for usage.
 -   [x]  Improved logging
 -   [ ]  Match mock on header values
 -   [ ]  Delete or update a specific mock based on name
--   [ ]  Allow for delaying a response
+-   [x]  Allow for delaying a response
 -   [ ]  Request passthrough to service

@@ -36,7 +36,12 @@ function MockController(mock) {
         `${request.method} ${request.path} mock not found`
       );
     }
-    res.status(found.response.statusCode).send(found.response.body);
+    const DEFAULT_WAIT_MS = 0;
+    const waitMs = found.response.timeout || DEFAULT_WAIT_MS;
+
+    setTimeout(() => {
+      res.status(found.response.statusCode).send(found.response.body);
+    }, waitMs);
   }
 
   return {
