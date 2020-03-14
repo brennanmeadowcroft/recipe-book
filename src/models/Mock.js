@@ -6,6 +6,18 @@ function Mock(options = {}) {
   const logger = options.logger || log;
   let currentMocks = {};
 
+  const responseBodySchema = {
+    body: Joi.alternatives()
+      .try(Joi.object(), Joi.array())
+      .default({}),
+    headers: Joi.object(),
+    statusCode: Joi.number()
+      .greater(199)
+      .less(600)
+      .required(),
+    timeout: Joi.number().default(0)
+  };
+
   const schema = Joi.object({
     name: Joi.string().required(),
     request: {
@@ -14,19 +26,16 @@ function Mock(options = {}) {
         .uppercase()
         .allow("GET", "PUT", "PATCH", "POST", "DELETE")
     },
-    response: {
-      body: Joi.alternatives()
-        .try(Joi.object(), Joi.array())
-        .default({}),
-      headers: Joi.object(),
-      statusCode: Joi.number()
-        .greater(199)
-        .less(600)
-        .required()
-    }
+    response: Joi.alternatives()
+      .try(
+        Joi.object(responseBodySchema),
+        Joi.array().items(responseBodySchema)
+      )
+      .required()
   });
 
   function add(mock) {
+    logger.debug({ mock }, "Mock received");
     if (Array.isArray(mock)) {
       logger.debug("Provided mock is array");
     }
@@ -35,7 +44,7 @@ function Mock(options = {}) {
     mockArray.forEach(m => {
       const { request } = m;
 
-      const alreadyExists = find(request);
+      const alreadyExists = _locate(request);
       if (alreadyExists) {
         logger.warn({ mock: m, found: alreadyExists }, "Already exists");
         throw new AlreadyExistsError("Mock already exists");
@@ -46,7 +55,7 @@ function Mock(options = {}) {
 
         const key = _generateKey(validated.request);
         currentMocks[key] = m;
-        logger.debug("Mock saved", { key, mock: validated });
+        logger.debug({ key, mock: validated }, "Mock saved");
       }
     });
   }
@@ -64,7 +73,43 @@ function Mock(options = {}) {
   }
 
   function find(request) {
-    logger.info({ request }, "Seeking mock");
+    const result = _locate(request);
+    if (!result) {
+      return;
+    }
+
+    logger.info({ result }, "Found result");
+    const parsedResult = _parseFromResponseArray(result);
+
+    return parsedResult;
+  }
+
+  function _parseFromResponseArray(result) {
+    if (!Array.isArray(result.response)) {
+      logger.debug(
+        { response: result.response },
+        "Response is not in the form of an array"
+      );
+      return result;
+    }
+
+    if (result.response.length === 0) {
+      throw new NotFoundError(
+        "Response found but response is empty. Perhaps there are no more responses in the sequence?"
+      );
+    }
+
+    // Pop index 0 and return it
+    logger.info("Response is an array.  Taking first result");
+    const parsed = { ...result };
+    delete parsed.response;
+    parsed.response = result.response.shift();
+
+    return parsed;
+  }
+
+  function _locate(request) {
+    logger.debug({ request }, "Locating mock");
     const key = _generateKey(request);
     const result = currentMocks[key];
     if (!result) {
@@ -73,7 +118,6 @@ function Mock(options = {}) {
 
     return result;
   }
-
   function _validate(mock) {
     const { error, value } = schema.validate(mock);
 
@@ -92,7 +136,8 @@ function Mock(options = {}) {
     add,
     all,
     clear,
-    find
+    find,
+    _parseFromResponseArray
   };
 
   if (process.env.NODE_ENV === "test") {

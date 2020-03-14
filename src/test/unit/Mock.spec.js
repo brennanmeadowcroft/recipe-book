@@ -1,5 +1,6 @@
 const { expect } = require("chai");
-const { validMock } = require("../helpers/fixtures");
+const cloneDeep = require("lodash.clonedeep");
+const { validMock, validArrayMock } = require("../helpers/fixtures");
 const Mock = require("../../models/Mock");
 
 let mock;
@@ -9,12 +10,14 @@ describe("Mock", function() {
   // Enables export of `currentMocks` object for unit testing
   process.env.NODE_ENV = "test";
 
-  describe("#add", function() {
+  describe.skip("#add", function() {
     it("should validate the mock before saving", function() {});
 
     describe("when provided with a valid mock", function() {
-      mock = new Mock();
-      mock.add(validMock);
+      before(function() {
+        mock = new Mock();
+        mock.add(validMock);
+      });
 
       it("should add it to the available mocks", function() {
         const mocks = mock.currentMocks;
@@ -135,6 +138,10 @@ describe("Mock", function() {
         expect(mockKeys).to.have.length(2);
       });
     });
+
+    describe("when the response object is an array", function() {
+      it("should add it to the mocks", function() {});
+    });
   });
 
   describe("#all", function() {
@@ -176,6 +183,76 @@ describe("Mock", function() {
 
       const found = mock.find({ path: "/hello", method: "GET" });
       expect(found).to.have.keys(["name", "request", "response"]);
+    });
+
+    describe("when response.body is an array", function() {
+      beforeEach(function() {
+        mock = Mock();
+      });
+      describe("and the first call is made", function() {
+        it("should return the response but set body = first element in the array", function() {
+          const mockCopy = cloneDeep(validArrayMock);
+          const result = mock._parseFromResponseArray(mockCopy);
+
+          const firstResponse = validArrayMock.response[0];
+
+          expect(result.response).to.deep.eq(firstResponse);
+          expect(result.request).to.deep.eq(mockCopy.request);
+        });
+
+        it("should remove the first element from the array entirely", function() {
+          const mockCopy = cloneDeep(validArrayMock);
+          const originalLength = mockCopy.response.length;
+          mock._parseFromResponseArray(mockCopy);
+
+          expect(mockCopy.response.length).to.eq(originalLength - 1);
+        });
+      });
+
+      describe("and the second call is made", function() {
+        it("should return the response with body = second element", function() {
+          const mockCopy = cloneDeep(validArrayMock);
+          mock._parseFromResponseArray(mockCopy);
+
+          const secondResult = mock._parseFromResponseArray(mockCopy);
+          expect(secondResult.response).to.deep.eq(validArrayMock.response[1]);
+        });
+
+        it("should remove the second element from the array", function() {
+          const mockCopy = cloneDeep(validArrayMock);
+          mock._parseFromResponseArray(mockCopy);
+
+          const secondResult = mock._parseFromResponseArray(mockCopy);
+          expect(mockCopy.response.length).to.eq(
+            validArrayMock.response.length - 2
+          );
+        });
+      });
+
+      describe("there are no more responses to return", function() {
+        it("should return a NotFoundError", function() {
+          const mockCopy = cloneDeep(validArrayMock);
+          mockCopy.response = [];
+
+          try {
+            mock._parseFromResponseArray(mockCopy);
+          } catch (err) {
+            expect(err.name).to.eq("NotFoundError");
+          }
+        });
+        it("should send a message indicating an empty response", function() {
+          const mockCopy = cloneDeep(validArrayMock);
+          mockCopy.response = [];
+
+          try {
+            mock._parseFromResponseArray(mockCopy);
+          } catch (err) {
+            expect(err.message).to.eq(
+              "Response found but response is empty. Perhaps there are no more responses in the sequence?"
+            );
+          }
+        });
+      });
     });
   });
 });

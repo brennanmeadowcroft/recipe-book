@@ -36,8 +36,6 @@ Recipe Book allows for full customization of request and response to match whate
 
 **Note:** Though not required, it's useful to clear out all mocks after a test has run to avoid any potential collisions and inadvertently broken tests.
 
-<br>
-
 ### REST Interface
 
 Recipe Book exposes a basic REST API for managing mocks on the service.
@@ -63,9 +61,57 @@ A new mock should follow a particular format:
 | `response.statusCode` | The status code that will be returned when this mock is called. | Integer | Any valid status code         |
 | `response.timeout`    | A time for the Recipe Book to wait before responding.           | Integer | Measured in milliseconds      |
 
+**!!Important Note:** Responses can either be a response object (`{ body, statusCode, timeout }`) or they can be an array of response objects.  Please see [Creating Mocks That Respond In Sequence](#creating-mocks-that-respond-in-sequence) for more detail.
+
 ### Matching A Mock
 
 Mocks are matched based on `request.path` and `request.method` so path should match `originalUrl` from Express.js.  This will include query parameters if submitted, e.g. `/hello?q=world`.
+
+### Creating Mocks That Respond In Sequence
+
+Recipe Book supports mocks that enable a particular flow that is dependent on other requests.  It will treat an array of response objects as a sequence and return them in order starting with index 0 until the array is empty.  Once it is empty it will return a `NotFoundError`.
+
+For example, say your application is processing a transaction and makes the following steps:
+
+```javascript
+1. GET /balance // result: 100
+2. POST /credit // { body: { amount: 25 } }
+3. GET /balance // result: 125
+```
+
+To model the above behavior, create two mocks:
+
+```javascript
+{ 
+    name: 'balances',
+    request: {
+        path: '/balance',
+        method: 'GET'
+    },
+    response: [
+        {
+            body: { balance: 100 },
+            statusCode: 200
+        },
+        {
+            body: { balance: 125 },
+            statusCode: 200
+        }
+    ]
+}
+
+{
+    name: 'createCredit',
+    request: {
+        path: '/credit',
+        method: 'GET'
+    },
+    response: {
+        body: {},
+        statusCode: 201
+    }
+}
+```
 
 ## Example
 
