@@ -10,28 +10,50 @@ describe("Mock", function() {
   // Enables export of `currentMocks` object for unit testing
   process.env.NODE_ENV = "test";
 
-  describe.skip("#add", function() {
-    it("should validate the mock before saving", function() {});
-
+  describe("#add", function() {
     describe("when provided with a valid mock", function() {
-      before(function() {
-        mock = new Mock();
-        mock.add(validMock);
+      describe("and responses are an object", function() {
+        before(function() {
+          mock = new Mock();
+          mock.add(validMock);
+        });
+
+        it("should add it to the available mocks", function() {
+          const mocks = mock.currentMocks;
+          expect(Object.keys(mocks)).to.have.length(1);
+        });
+
+        it("should set the key to the correct value", function() {
+          const mocks = mock.currentMocks;
+          expect(mocks).to.have.key(expectedKey);
+        });
+
+        it("should store the mock under the correct key", function() {
+          const mocks = mock.currentMocks;
+          expect(mocks[expectedKey]).to.deep.eq(validMock);
+        });
       });
 
-      it("should add it to the available mocks", function() {
-        const mocks = mock.currentMocks;
-        expect(Object.keys(mocks)).to.have.length(1);
-      });
+      describe("and responses are an array of objects", function() {
+        before(function() {
+          mock = new Mock();
+          mock.add(validArrayMock);
+        });
 
-      it("should set the key to the correct value", function() {
-        const mocks = mock.currentMocks;
-        expect(mocks).to.have.key(expectedKey);
-      });
+        it("should add it to the available mocks", function() {
+          const mocks = mock.currentMocks;
+          expect(Object.keys(mocks)).to.have.length(1);
+        });
 
-      it("should store the mock under the correct key", function() {
-        const mocks = mock.currentMocks;
-        expect(mocks[expectedKey]).to.deep.eq(validMock);
+        it("should set the key to the correct value", function() {
+          const mocks = mock.currentMocks;
+          expect(mocks).to.have.key(expectedKey);
+        });
+
+        it("should store the mock under the correct key", function() {
+          const mocks = mock.currentMocks;
+          expect(mocks[expectedKey]).to.deep.eq(validArrayMock);
+        });
       });
     });
 
@@ -137,10 +159,6 @@ describe("Mock", function() {
 
         expect(mockKeys).to.have.length(2);
       });
-    });
-
-    describe("when the response object is an array", function() {
-      it("should add it to the mocks", function() {});
     });
   });
 

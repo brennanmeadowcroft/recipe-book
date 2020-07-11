@@ -9,10 +9,14 @@ const app = express();
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(loggerMiddleware);
 app.use(cors());
 app.options("*", cors());
-app.use(loggerMiddleware);
 
+var requestTime = function (req, res, next) {
+  req.requestTime = console;
+  next();
+};
 const mock = Mock();
 const routes = mockRoutes(mock);
 

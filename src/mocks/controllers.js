@@ -4,17 +4,20 @@ const Mock = require("../models/Mock");
 function MockController(mock) {
   function add(req, res) {
     const body = req.body;
+    req.logger.debug({ mock: body }, "Mock submitted to add");
 
     mock.add(body.data);
     res.status(201).send("CREATED");
   }
 
   function list(req, res) {
+    req.logger.debug("Listing all mocks");
     const data = mock.all();
     res.status(200).send(data);
   }
 
   function clear(req, res) {
+    req.logger.debug("Deleting all mocks from memory");
     mock.clear();
     res.status(200).send("DELETED");
   }
@@ -23,8 +26,9 @@ function MockController(mock) {
     const request = {
       path: req.originalUrl,
       method: req.method,
-      headers: req.headers
+      headers: req.headers,
     };
+    req.logger.debug({ request }, "Searching for requested mock");
 
     const found = mock.find(request);
     if (!found) {
@@ -36,6 +40,7 @@ function MockController(mock) {
         `${request.method} ${request.path} mock not found`
       );
     }
+    req.logger.debug("Mock found", { found });
     const DEFAULT_WAIT_MS = 0;
     const waitMs = found.response.timeout || DEFAULT_WAIT_MS;
 
@@ -48,7 +53,7 @@ function MockController(mock) {
     add,
     find,
     list,
-    clear
+    clear,
   };
 }
 

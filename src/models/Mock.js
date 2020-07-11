@@ -7,15 +7,10 @@ function Mock(options = {}) {
   let currentMocks = {};
 
   const responseBodySchema = {
-    body: Joi.alternatives()
-      .try(Joi.object(), Joi.array())
-      .default({}),
+    body: Joi.alternatives().try(Joi.object(), Joi.array()).default({}),
     headers: Joi.object(),
-    statusCode: Joi.number()
-      .greater(199)
-      .less(600)
-      .required(),
-    timeout: Joi.number().default(0)
+    statusCode: Joi.number().greater(199).less(600).required(),
+    timeout: Joi.number().default(0),
   };
 
   const schema = Joi.object({
@@ -24,20 +19,20 @@ function Mock(options = {}) {
       path: Joi.string().required(),
       method: Joi.string()
         .uppercase()
-        .allow("GET", "PUT", "PATCH", "POST", "DELETE")
+        .allow("GET", "PUT", "PATCH", "POST", "DELETE"),
     },
     response: Joi.alternatives()
       .try(
         Joi.object(responseBodySchema),
         Joi.array().items(responseBodySchema)
       )
-      .required()
+      .required(),
   });
 
   function add(mock) {
-    logger.debug({ mock }, "Mock received");
+    logger.info({ mock }, "Mock received");
     if (Array.isArray(mock)) {
-      logger.debug("Provided mock is array");
+      logger.debug("Provided mock is array.  Saving all responses.");
     }
     const mockArray = Array.isArray(mock) ? mock : [mock];
 
@@ -55,7 +50,7 @@ function Mock(options = {}) {
 
         const key = _generateKey(validated.request);
         currentMocks[key] = m;
-        logger.debug({ key, mock: validated }, "Mock saved");
+        logger.info({ key, mock: validated }, "Mock saved");
       }
     });
   }
@@ -64,17 +59,20 @@ function Mock(options = {}) {
     const formatted = Object.keys(currentMocks).map(mock => {
       return currentMocks[mock];
     });
+    logger.debug({ count: formatted.length }, "All mocks available");
 
     return formatted;
   }
 
   function clear() {
+    logger.debug("Seeing current mocks = {}");
     currentMocks = {};
   }
 
   function find(request) {
     const result = _locate(request);
     if (!result) {
+      logger.debug({ result, request }, "No result found");
       return;
     }
 
@@ -137,7 +135,7 @@ function Mock(options = {}) {
     all,
     clear,
     find,
-    _parseFromResponseArray
+    _parseFromResponseArray,
   };
 
   if (process.env.NODE_ENV === "test") {
