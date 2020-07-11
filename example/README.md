@@ -8,6 +8,10 @@ Start the server by running Recipe Book and the example UI in docker:
 
     npm run example
 
+The example application is available at: [http://localhost:3000/test](http://localhost:3000/test).
+ 
+⚠️`localhost` may be different if you are using docker machine.  If this is the case, you will need to replace `localhost` with your docker machine ip address.
+
 Run the automated tests:
 
     npm test

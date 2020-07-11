@@ -6,7 +6,13 @@ Recipe Book is a lightweight mock server that takes a provided request/response 
 
 **Why "Recipe Book"?**
 
-Recipes provide instruction for how to prepare something.  In that way, creating a mock is like making a recipe... you define the instructions and the service will replay them.
+Recipes provide instruction for how to prepare something.  In that way, creating a mock is like making a recipe... you define the ingredients and instructions and the service will replay them to produce an output you want... but with fewer calories.
+
+**Why not store mocks?**
+
+Caching mocks with something like Redis is on the TODO list which should make life easier when using Recipe Book for local development.  
+
+As far as relying on a database, it is my belief that the value in Recipe Book is the flexibility provided by mocks that can be created on the fly, before tests or for specific development work.  This way, we can adjust request/response cycles as needed for edge cases without worrying about the number of variations being stored or whether a scenario has already been created.
 
 <br>
 
@@ -124,3 +130,5 @@ Refer to the `/example` directory for usage.
 -   [ ]  Delete or update a specific mock based on name
 -   [x]  Allow for delaying a response
 -   [ ]  Request passthrough to service
+-   [ ]  "Sessions" to avoid collisions if Recipe Book is deployed
+-   [ ]  Enable caching for _temporary_ storage of mocks 
